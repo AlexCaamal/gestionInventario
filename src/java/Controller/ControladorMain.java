@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ControladorMain extends HttpServlet {
 
     RepositorioUsuario repoUsuario = new RepositorioUsuario();
+    Boolean esError = false;
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -72,8 +73,11 @@ public class ControladorMain extends HttpServlet {
             Respuesta respuestaRepo = repoUsuario.ValidarUsuario(user, pass);
             
             if(respuestaRepo.esExito()){
-                request.getRequestDispatcher("ControladorDashBoard?accion=dashboard").forward(request, response);
+                request.getRequestDispatcher("ControladorDashBoard?accion=lista").forward(request, response);
             }else{
+                this.esError = true;
+                request.setAttribute("mensajeError", respuestaRepo.mensaje);
+                request.setAttribute("esError", esError);
                 request.getRequestDispatcher("index.jsp").forward(request, response);
             }
         }else{

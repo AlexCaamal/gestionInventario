@@ -18,7 +18,7 @@
             <form class=" form-sing" action="ControladorMain" method="POST">
                 <div class="form-group text-center" style="color: white; justify-content: center; width: 100%">
                     <h1>Login</h1>
-                    <h2>Bienvenidos</h3>
+                    <h2>Bienvenido</h3>
                 </div>
                 <br>
                 <div class="row mb-3">
@@ -33,12 +33,24 @@
                         <input type="password" class="form-control" id="inputPassword" name="inputPassword">
                     </div>
                 </div>
+                <%
+                    String mensajeError = (String) request.getAttribute("mensajeError");
+                    if (mensajeError != null && !mensajeError.isEmpty()) {
+                %>
+                <div style="color: red;">
+                    <%= mensajeError%>
+                </div>
+                <%
+                    }
+                %>
+
+
                 <div style="text-align: right;"> <input type="submit" name="accion" class="btn btn-primary" value="Ingresar" style="height: 50px; width: 100px"></div>
             </form>
         </div>
         <footer>
             <p><li> Juan Armando Carranza Madagan <li> Erick Armando Díaz Jimenez <br> &copy; 2023 Inventario de Productos</p>
-            
+
         </footer>
     </body>
 </html>

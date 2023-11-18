@@ -19,6 +19,11 @@ public class Respuesta<TResult> {
         this.mensaje = null;
     }
     
+    public Respuesta() {
+        this.contenido = null;
+        this.mensaje = null;
+    }
+    
     public boolean esExito() {
         return this.mensaje == null;
     }

@@ -12,7 +12,7 @@ public class RepositorioUsuario {
     
     public Respuesta<Boolean> ValidarUsuario(String usuario, String password){
         
-        String sql = "SELECT*FROM empleado WHERE Usuario = ? AND Contraseña = ?";
+        String sql = "SELECT*FROM empleado WHERE Usuario = ? AND Contraseña = ? AND Activo = 1";
         
         try {
             conexion = ConexionBD.GetConnection();
@@ -27,6 +27,8 @@ public class RepositorioUsuario {
                 respuesta = rs.getString("Nombres");
             }
             
+            conexion.close(); rs.close(); ps.close();
+            
             if(respuesta.isEmpty() || respuesta == null)
                 return new Respuesta("Usuario y/o Contraseña son invalidos, intente nuevamente.");
             
@@ -34,6 +36,6 @@ public class RepositorioUsuario {
             return new Respuesta("Error BD: "+e.getMessage());
         }
         
-        return new Respuesta(true);
+        return new Respuesta<Boolean>(true);
     }
 }

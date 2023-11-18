@@ -15,15 +15,26 @@
     </head>
     <body>
         <header>
-            <h1>Inventario de Productos</h1>
+                <div class="row justify-content-between align-items-center">
+                    <div class="col" style="justify-content: left; text-align: left; margin-left: 1%;">
+                        <h1>Inventario de Productos</h1>
+                    </div>
+                    <div style="margin-right: 1%; width: 150px;">
+                        <a href="ControladorDashBoard?accion=logout" class="btn btn-outline-danger">Cerrar Sesión</a>
+                    </div>
+                </div>
         </header>
         <section>
             <p>Bienvenido a nuestro sistema de gestión de inventario de productos. Aquí puedes:</p>
-            <a href="catalogo.html" class="cta-button">Ver Catálogo</a>
-            <a href="agregar.html" class="cta-button">Agregar Producto</a>
+            <a href="Controlador?accion=lista" class="cta-button">Productos</a>
+            <form action="ControladorDashBoard" method="GET">
+                <input type="submit" name="accion" value="Productos" class="cta-button">
+            </form>
+            <br>
+            <a href="agregar.html" class="cta-button">Agregar Categoria</a>
         </section>
         <footer>
-            <p>&copy; 2023 Inventario de Productos Hecho por Carranza</p>
+            <p>&copy; 2023 Inventario de Productos </p>
         </footer>
 
     </body>
