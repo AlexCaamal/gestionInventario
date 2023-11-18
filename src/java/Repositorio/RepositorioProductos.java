@@ -96,14 +96,15 @@ public class RepositorioProductos {
 
     public Respuesta<Boolean> ObtenerNombreRepetido(String nombre) {
 
-        if (nombre == null || nombre.isBlank()) {
+        if (nombre == null || nombre.isEmpty()) {
             return new Respuesta<Boolean>("El campo 'Nombre' es obligario.");
         }
 
         try {
-            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND Nombre = " + nombre;
+            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND Nombre = ?" ;
             conexion = ConexionBD.GetConnection();
             ps = conexion.prepareStatement(sql);
+            ps.setString(1, nombre);
             rs = ps.executeQuery();
 
             int repetidos = 0;
@@ -136,14 +137,15 @@ public class RepositorioProductos {
 
     public Respuesta<Boolean> ObtenerCodigoRepetido(String codigoBarra) {
 
-        if (codigoBarra == null || codigoBarra.isBlank()) {
+        if (codigoBarra == null || codigoBarra.isEmpty()) {
             return new Respuesta<Boolean>("El campo 'Nombre' es obligario.");
         }
 
         try {
-            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND CodigoBarra = " + codigoBarra;
+            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND CodigoBarra = ?";
             conexion = ConexionBD.GetConnection();
             ps = conexion.prepareStatement(sql);
+            ps.setString(1, codigoBarra);
             rs = ps.executeQuery();
 
             int repetidos = 0;
@@ -180,11 +182,11 @@ public class RepositorioProductos {
             return new Respuesta<Boolean>("Ha ocurrido en la creación del Producto, intente de nuevo.");
         }
 
-        if (producto.getNombre() == null || producto.getNombre().isBlank()) {
+        if (producto.getNombre() == null || producto.getNombre().isEmpty()) {
             return new Respuesta<Boolean>("El campo 'Nombre' es obligario.");
         }
 
-        if (producto.getCodigoBarra() == null || producto.getCodigoBarra().isBlank()) {
+        if (producto.getCodigoBarra() == null || producto.getCodigoBarra().isEmpty()) {
             return new Respuesta<Boolean>("El campo 'Código de Barra' es obligario.");
         }
 

@@ -21,7 +21,7 @@
             </div>
         </header>
         <div class="container" style="margin-top: 2%;">
-            <form id="miFormulario" action="ControladorListaProductos" method="POST">
+            <form id="miFormulario" action="Controlador" method="POST">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="textCodBarra" name="textCodBarra" placeholder="8as5s554sw" required>
                     <label for="floatingInput">Código de Barra</label>
@@ -48,7 +48,7 @@
                 </div>
                 <br>
                 
-                <a href="ControladorListaProductos?accion=cancelar" class="btn btn-outline-danger">Cancelar</a>
+                <a href="Controlador?accion=cancelar" class="btn btn-outline-danger">Cancelar</a>
                 <input type="submit" name="accion" value="Agregar" class="btn btn-outline-success">
             </form>
         </div>

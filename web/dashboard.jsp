@@ -25,13 +25,10 @@
                 </div>
         </header>
         <section>
-            <p>Bienvenido a nuestro sistema de gestión de inventario de productos. Aquí puedes:</p>
+            <p>Bienvenido al sistema de gestión de inventario de productos.</p>
             <a href="Controlador?accion=lista" class="cta-button">Productos</a>
-            <form action="ControladorDashBoard" method="GET">
-                <input type="submit" name="accion" value="Productos" class="cta-button">
-            </form>
-            <br>
-            <a href="agregar.html" class="cta-button">Agregar Categoria</a>
+            
+            <a href="agregar.html" class="cta-button" style="margin-top: 1%">Agregar Categoria</a>
         </section>
         <footer>
             <p>&copy; 2023 Inventario de Productos </p>

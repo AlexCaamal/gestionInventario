@@ -44,6 +44,9 @@ public class Controlador extends HttpServlet {
             case "crear":
                 request.getRequestDispatcher("crearProducto.jsp").forward(request, response);
                 break;
+            case "cancelar":
+                request.getRequestDispatcher("Controlador?accion=lista").forward(request, response);
+                break;
             default:
                 throw new AssertionError("Acción no válida: " + accion);
         }
@@ -79,6 +82,44 @@ public class Controlador extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String MensajeErrorCrear = null;
+        String accion = request.getParameter("accion");
+        switch (accion) {
+            case "Agregar":
+                String textCodBarra = request.getParameter("textCodBarra");
+                String textNombre = request.getParameter("textNombre");
+                String textDescripcion = request.getParameter("textDescripcion");
+                String textPrecio = request.getParameter("textPrecio");
+                String textStock = request.getParameter("textStock");
+
+                Respuesta<Boolean> responseBD = repoProducto.ObtenerNombreRepetido(textNombre);
+
+                if (responseBD.esExito()) {
+
+                    Respuesta<Boolean> responseBDCod = repoProducto.ObtenerCodigoRepetido(textCodBarra);
+
+                    if (responseBDCod.esExito()) {
+
+                        Producto producto = new Producto(0, textNombre, 0, textDescripcion, Double.parseDouble(textStock), textCodBarra);
+
+                        Respuesta<Boolean> responseCrear = repoProducto.AgregarProducto(producto, textPrecio, responseBD.contenido, responseBDCod.contenido);
+
+                        if (responseCrear.esExito()) {
+//                            this.CrearCorrecto(response);
+                        } else {
+                            this.responseError(request, responseCrear.mensaje);
+                        }
+                    } else {
+                        this.responseError(request, responseBDCod.mensaje);
+                    }
+                } else {
+                    this.responseError(request, responseBD.mensaje);
+                }
+
+                break;
+            default:
+                processRequest(request, response);
+        }
         processRequest(request, response);
     }
 
@@ -117,5 +158,11 @@ public class Controlador extends HttpServlet {
             session.invalidate();
         }
         response.sendRedirect("index.jsp");
+    }
+    
+    private void responseError(HttpServletRequest request, String mensajeError) {
+        this.esError = true;
+        request.setAttribute("mensajeErrorBD", mensajeError);
+        request.setAttribute("esError", esError);
     }
 }
