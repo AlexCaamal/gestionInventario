@@ -65,12 +65,12 @@ public class RepositorioProductos {
             rs.close();
             ps.close();
 
-            if (producto.getDescripcion() == null) {
+            if (producto.getNombre() == null) {
                 return new Respuesta<Producto>("El producto se previamente eliminado.");
             }
 
         } catch (Exception e) {
-            return new Respuesta<Producto>("Error BD: No se a completado la consulta del Producto, intente nuevamente. "+e.getMessage());
+            return new Respuesta<Producto>("Error BD: No se a completado la consulta del Producto, intente nuevamente. " + e.getMessage());
         }
 
         return new Respuesta<Producto>(producto);
@@ -101,10 +101,52 @@ public class RepositorioProductos {
         }
 
         try {
-            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND Nombre = ?" ;
+            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND Nombre = ?";
             conexion = ConexionBD.GetConnection();
             ps = conexion.prepareStatement(sql);
             ps.setString(1, nombre);
+            rs = ps.executeQuery();
+
+            int repetidos = 0;
+
+            while (rs.next()) {
+                repetidos = rs.getInt("repetidos");
+            }
+
+            if (repetidos != 0) {
+                return new Respuesta<Boolean>(true);
+            }
+
+        } catch (SQLException e) {
+            return new Respuesta<Boolean>("Error BD: No se a completado la consulta del Producto, intente nuevamente.");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return new Respuesta<Boolean>(false);
+    }
+    
+    public Respuesta<Boolean> ObtenerNombreRepetidoPorId(String nombre, int Id) {
+
+        if (nombre == null || nombre.isEmpty()) {
+            return new Respuesta<Boolean>("El campo 'Nombre' es obligario.");
+        }
+
+        try {
+            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND Nombre = ? AND Id != ?";
+            conexion = ConexionBD.GetConnection();
+            ps = conexion.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setInt(2, Id);
             rs = ps.executeQuery();
 
             int repetidos = 0;
@@ -175,40 +217,82 @@ public class RepositorioProductos {
 
         return new Respuesta<Boolean>(false);
     }
+    
+    public Respuesta<Boolean> ObtenerCodigoRepetidoPorId(String codigoBarra, int Id) {
 
-    public Respuesta<Boolean> AgregarProducto(Producto producto, String precio, Boolean nombreRepetido, Boolean codigoBarraRepetido) {
-
-        if (producto == null) {
-            return new Respuesta<Boolean>("Ha ocurrido en la creación del Producto, intente de nuevo.");
-        }
-
-        if (producto.getNombre() == null || producto.getNombre().isEmpty()) {
+        if (codigoBarra == null || codigoBarra.isEmpty()) {
             return new Respuesta<Boolean>("El campo 'Nombre' es obligario.");
         }
 
+        try {
+            String sql = "SELECT COUNT(Id) AS repetidos FROM producto WHERE Activo = 1 AND CodigoBarra = ? AND Id != ?";
+            conexion = ConexionBD.GetConnection();
+            ps = conexion.prepareStatement(sql);
+            ps.setString(1, codigoBarra);
+            ps.setInt(2, Id);
+            rs = ps.executeQuery();
+
+            int repetidos = 0;
+
+            while (rs.next()) {
+                repetidos = rs.getInt("repetidos");
+            }
+
+            if (repetidos != 0) {
+                return new Respuesta<Boolean>(true);
+            }
+
+        } catch (SQLException e) {
+            return new Respuesta<Boolean>("Error BD: No se a completado la consulta del Producto, intente nuevamente.");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return new Respuesta<Boolean>(false);
+    }
+
+    public Respuesta<Producto> AgregarProducto(Producto producto, String precio, Boolean nombreRepetido, Boolean codigoBarraRepetido) {
+
+        if (producto == null) {
+            return new Respuesta<Producto>("Ha ocurrido en la creación del Producto, intente de nuevo.");
+        }
+
+        if (producto.getNombre() == null || producto.getNombre().isEmpty()) {
+            return new Respuesta<Producto>("El campo 'Nombre' es obligario.");
+        }
+
         if (producto.getCodigoBarra() == null || producto.getCodigoBarra().isEmpty()) {
-            return new Respuesta<Boolean>("El campo 'Código de Barra' es obligario.");
+            return new Respuesta<Producto>("El campo 'Código de Barra' es obligario.");
         }
 
         if (nombreRepetido) {
-            return new Respuesta<Boolean>("El Nombre '" + producto.getNombre() + "' ya se encuentra registrado.");
+            return new Respuesta<Producto>("El Nombre '" + producto.getNombre() + "' ya se encuentra registrado.");
         }
 
         if (codigoBarraRepetido) {
-            return new Respuesta<Boolean>("El Código de Barra '" + producto.getCodigoBarra() + "' ya se encuentra registrado.");
+            return new Respuesta<Producto>("El Código de Barra '" + producto.getCodigoBarra() + "' ya se encuentra registrado.");
         }
 
         try {
             double valorParceado = Double.parseDouble(precio);
 
             if (valorParceado == 0) {
-                return new Respuesta<Boolean>("El campo 'Precio' es obligario.");
+                return new Respuesta<Producto>("El campo 'Precio' es obligario.");
             }
 
             producto.setPrecio(valorParceado);
 
         } catch (NumberFormatException e) {
-            return new Respuesta<Boolean>("Por favor, ingrese un valor válido para el Campo 'Precio'.");
+            return new Respuesta<Producto>("Por favor, ingrese un valor válido para el Campo 'Precio'.");
         }
 
         try {
@@ -225,7 +309,7 @@ public class RepositorioProductos {
             ps.executeUpdate();
 
         } catch (Exception e) {
-            return new Respuesta<Boolean>("Error BD: No se a completado la eliminacion del Producto, intente nuevamente..." + e.getMessage());
+            return new Respuesta<Producto>("Error BD: No se a completado la eliminacion del Producto, intente nuevamente..." + e.getMessage());
         } finally {
             try {
                 if (ps != null) {
@@ -238,6 +322,72 @@ public class RepositorioProductos {
                 e.printStackTrace();
             }
         }
-        return new Respuesta<Boolean>(true);
+        return new Respuesta<Producto>(producto);
+    }
+
+    public Respuesta<Producto> Modificar(Producto producto, String precio, Boolean nombreRepetido, Boolean codigoBarraRepetido) {
+
+        if (producto == null) {
+            return new Respuesta<Producto>("Ha ocurrido en la creación del Producto, intente de nuevo.");
+        }
+
+        if (producto.getNombre() == null || producto.getNombre().isEmpty()) {
+            return new Respuesta<Producto>("El campo 'Nombre' es obligario.");
+        }
+
+        if (producto.getCodigoBarra() == null || producto.getCodigoBarra().isEmpty()) {
+            return new Respuesta<Producto>("El campo 'Código de Barra' es obligario.");
+        }
+
+        if (nombreRepetido) {
+            return new Respuesta<Producto>("El Nombre '" + producto.getNombre() + "' ya se encuentra registrado.");
+        }
+
+        if (codigoBarraRepetido) {
+            return new Respuesta<Producto>("El Código de Barra '" + producto.getCodigoBarra() + "' ya se encuentra registrado.");
+        }
+
+        try {
+            double valorParceado = Double.parseDouble(precio);
+
+            if (valorParceado == 0) {
+                return new Respuesta<Producto>("El campo 'Precio' es obligario.");
+            }
+
+            producto.setPrecio(valorParceado);
+
+        } catch (NumberFormatException e) {
+            return new Respuesta<Producto>("Por favor, ingrese un valor válido para el Campo 'Precio'.");
+        }
+
+        try {
+            String sql = "UPDATE producto SET Nombre = ?, Precio = ?, Descripcion = ?, Stock = ?, CodigoBarra = ? WHERE Id = ?;";
+            conexion = ConexionBD.GetConnection();
+            ps = conexion.prepareStatement(sql);
+
+            ps.setString(1, producto.getNombre());
+            ps.setDouble(2, producto.getPrecio());
+            ps.setString(3, producto.getDescripcion());
+            ps.setDouble(4, producto.getStock());
+            ps.setString(5, producto.getCodigoBarra());
+            ps.setInt(6, producto.getId());
+            
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            return new Respuesta<Producto>("Error BD: No se a completado la Modificación del Producto, intente nuevamente..." + e.getMessage());
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return new Respuesta<Producto>(producto);
     }
 }

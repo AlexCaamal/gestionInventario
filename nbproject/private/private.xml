@@ -3,11 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/src/java/Modelo/Producto.java</file>
             <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/src/java/Controller/ControladorDashBoard.java</file>
             <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/web/listaProductos.jsp</file>
             <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/web/crearProducto.jsp</file>
-            <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/src/java/Controller/ControladorListaProductos.java</file>
             <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/src/java/Controller/Controlador.java</file>
+            <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/web/editar_producto.jsp</file>
             <file>file:/C:/Users/CCNAR/OneDrive/Documentos/GitHub/gestionInventario/src/java/Repositorio/RepositorioProductos.java</file>
         </group>
     </open-files>

@@ -74,9 +74,9 @@ public class ControladorListaProductos extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id = request.getParameter("idProducto");
-//        if (id != null && id != "") {
-//            String accion = request.getParameter("accion");
-//            switch (accion) {
+        if (id != null && id != "") {
+            String accion = request.getParameter("accion");
+            switch (accion) {
 //                case "editar":
 //
 //                    int idProducto = Integer.parseInt(id);
@@ -96,36 +96,35 @@ public class ControladorListaProductos extends HttpServlet {
 //                        response.getWriter().write("Error al obtener los detalles del producto.");
 //                    }
 //                    break;
-//                case "eliminar":
-//
-//                    int idProductoEliminar = Integer.parseInt(id);
-//                    Respuesta respuestaEliminar = repoProducto.DeleteProductoPorId(idProductoEliminar);
-//
-//                    if (respuestaEliminar.esExito()) {
-//
-//                        Respuesta<List<Producto>> respuestaBD = repoProducto.GetProductos();
-//
-//                        if (respuestaBD.esExito()) {
-//                            List<Producto> listaProducto = respuestaBD.contenido;
-//                            request.setAttribute("listaProducto", listaProducto);
-//                            request.getRequestDispatcher("listaProductos.jsp").forward(request, response);
-//                        } else {
-//                            this.esError = true;
-//                            request.setAttribute("mensajeErrorBD", respuestaBD.mensaje);
-//                            request.setAttribute("esError", esError);
-//                            request.getRequestDispatcher("listaProductos.jsp").forward(request, response);
-//                        }
-//                    } else {
-//                        // Manejar el caso en el que no se puede obtener el producto
-//                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//                        response.getWriter().write("Error al obtener los detalles del producto.");
-//                    }
-//                    break;
-//                default:
-//                    throw new AssertionError();
-//            }
-//        }
-        processRequest(request, response);
+                case "eliminar":
+
+                    int idProductoEliminar = Integer.parseInt(id);
+                    Respuesta respuestaEliminar = repoProducto.DeleteProductoPorId(idProductoEliminar);
+
+                    if (respuestaEliminar.esExito()) {
+
+                        Respuesta<List<Producto>> respuestaBD = repoProducto.GetProductos();
+
+                        if (respuestaBD.esExito()) {
+                            List<Producto> listaProducto = respuestaBD.contenido;
+                            request.setAttribute("listaProducto", listaProducto);
+                            request.getRequestDispatcher("listaProductos.jsp").forward(request, response);
+                        } else {
+                            this.esError = true;
+                            request.setAttribute("mensajeErrorBD", respuestaBD.mensaje);
+                            request.setAttribute("esError", esError);
+                            request.getRequestDispatcher("listaProductos.jsp").forward(request, response);
+                        }
+                    } else {
+                        // Manejar el caso en el que no se puede obtener el producto
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("Error al obtener los detalles del producto.");
+                    }
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+        }
     }
 
     /**

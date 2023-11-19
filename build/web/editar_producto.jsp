@@ -1,3 +1,4 @@
+<%@page import="Modelo.Producto"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -10,18 +11,75 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Agragar Producto</title>
     </head>
     <body>
         <header>
-            <div class="row justify-content-between align-items-center">
-                <div class="col" style="justify-content: left; text-align: left; margin-left: 1%;">
-                    <h1>Editar Producto</h1>
-                </div>
-                <div style="margin-right: 1%; width: 150px;">
-                    <a href="ControladorListaProductos?accion=logout" class="btn btn-outline-danger">Cerrar Sesión</a>
+            <div class="row">
+                <div class="col-7">
+                    <h1>Modificar Producto</h1>
                 </div>
             </div>
         </header>
+        <div class="container" style="margin-top: 2%;">
+            <%
+                Boolean esError = (Boolean) request.getAttribute("esError");
+                String mensajeError = (String) request.getAttribute("mensajeErrorBD");
+                Producto producto = (Producto) request.getAttribute("producto");
+
+                if (esError != null && mensajeError != "" && esError) {
+            %>
+            <div class="alert alert-danger" role="alert">
+                <%=mensajeError%>
+            </div>
+            <%} else {%>
+
+            <div class="alert alert-danger" role="alert" style="display: none;">
+                A simple danger alert—check it out!
+            </div>
+            <%}%>
+            
+            <form id="miFormulario" action="Controlador" method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="textCodBarra" value="<%=producto.getCodigoBarra() == null ? "" : producto.getCodigoBarra()%>" name="textCodBarra" placeholder="8as5s554sw" required>
+                    <label for="floatingInput">Código de Barra</label>
+                </div>
+                <br>
+                <div class="form-floating">
+                    <input type="text" value="<%=producto.getNombre() == null ? "" : producto.getNombre()%>" class="form-control" id="textNombre" name="textNombre" placeholder="Nombre Producto" required>
+                    <label for="floatingPassword">Nombre</label>
+                </div>
+                <br>
+                <div class="form-floating">
+                    <textarea type="text" class="form-control" id="textDescripcion" name="textDescripcion" placeholder="Descripción" style="height: 100px;"><%= producto.getDescripcion() == null ? "" : producto.getDescripcion() %></textarea>
+                    <label for="floatingPassword">Descripción</label>
+                </div>
+                <br>
+                <div class="form-floating">
+                    <input type="text" value="<%=producto.getPrecio()== 0 ? "" : producto.getPrecio()%>" class="form-control" id="textPrecio" name="textPrecio" placeholder="Precio" required>
+                    <label for="floatingPassword">Precio</label>
+                </div>
+                <br>
+                <div class="form-floating">
+                    <input type="number" value="<%=producto.getStock() == 0 ? "" : producto.getStock()%>" class="form-control" id="textStock" name="textStock" placeholder="0"  min="0" required>
+                    <label for="floatingPassword">Stock</label>
+                </div>
+                <br>
+                <div style="display: none;">
+                    <input type="text" value="<%=producto.getId()%>" class="form-control" id="textId" name="textId" placeholder="0"  >
+                    <label for="floatingPassword">Id</label>
+                </div>
+
+                <a href="Controlador?accion=cancelar" class="btn btn-outline-danger">Cancelar</a>
+                <input type="submit" name="accion" value="Modificar" class="btn btn-outline-success">
+            </form>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        <script src="https://unpkg.com/flowbite@1.4.7/dist/flowbite.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     </body>
 </html>

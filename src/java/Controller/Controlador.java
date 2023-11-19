@@ -20,6 +20,7 @@ public class Controlador extends HttpServlet {
 
     Boolean esError = false;
     RepositorioProductos repoProducto = new RepositorioProductos();
+    String mensajeErrorBD = null;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,9 +43,19 @@ public class Controlador extends HttpServlet {
                 handleLogoutAction(request, response);
                 break;
             case "crear":
+                this.esError = false;
+                request.setAttribute("producto", new Producto());
+                request.setAttribute("mensajeErrorBD", "");
+                request.setAttribute("esError", esError);
                 request.getRequestDispatcher("crearProducto.jsp").forward(request, response);
                 break;
             case "cancelar":
+                request.getRequestDispatcher("Controlador?accion=lista").forward(request, response);
+                break;
+            case "Agregar":
+                request.getRequestDispatcher("Controlador?accion=lista").forward(request, response);
+                break;
+            case "Modificar":
                 request.getRequestDispatcher("Controlador?accion=lista").forward(request, response);
                 break;
             default:
@@ -64,10 +75,20 @@ public class Controlador extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        String param = request.getParameter("accion");
-//        if (param != null && param.equalsIgnoreCase("lista")) {
-//            request.getRequestDispatcher("index.jsp").forward(request, response);
-//        }
+        String id = request.getParameter("idProducto");
+        if (id != null && id != "") {
+            String accion = request.getParameter("accion");
+            switch (accion) {
+                case "editar":
+                    this.ObtenerPorId(request, response, id);
+                    break;
+                case "eliminar":
+                    this.ElimibarPorId(request, response, id);
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+        }
         processRequest(request, response);
     }
 
@@ -82,45 +103,17 @@ public class Controlador extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String MensajeErrorCrear = null;
         String accion = request.getParameter("accion");
         switch (accion) {
             case "Agregar":
-                String textCodBarra = request.getParameter("textCodBarra");
-                String textNombre = request.getParameter("textNombre");
-                String textDescripcion = request.getParameter("textDescripcion");
-                String textPrecio = request.getParameter("textPrecio");
-                String textStock = request.getParameter("textStock");
-
-                Respuesta<Boolean> responseBD = repoProducto.ObtenerNombreRepetido(textNombre);
-
-                if (responseBD.esExito()) {
-
-                    Respuesta<Boolean> responseBDCod = repoProducto.ObtenerCodigoRepetido(textCodBarra);
-
-                    if (responseBDCod.esExito()) {
-
-                        Producto producto = new Producto(0, textNombre, 0, textDescripcion, Double.parseDouble(textStock), textCodBarra);
-
-                        Respuesta<Boolean> responseCrear = repoProducto.AgregarProducto(producto, textPrecio, responseBD.contenido, responseBDCod.contenido);
-
-                        if (responseCrear.esExito()) {
-//                            this.CrearCorrecto(response);
-                        } else {
-                            this.responseError(request, responseCrear.mensaje);
-                        }
-                    } else {
-                        this.responseError(request, responseBDCod.mensaje);
-                    }
-                } else {
-                    this.responseError(request, responseBD.mensaje);
-                }
-
+                this.CrearProducto(request, response);
+                break;
+            case "Modificar":
+                this.Modificar(request, response);
                 break;
             default:
                 processRequest(request, response);
         }
-        processRequest(request, response);
     }
 
     /**
@@ -138,16 +131,11 @@ public class Controlador extends HttpServlet {
         Respuesta<List<Producto>> respuestaBD = this.repoProducto.GetProductos();
 
         if (respuestaBD.esExito()) {
-            List<Producto> listaProducto = respuestaBD.contenido;
-            request.setAttribute("listaProducto", listaProducto);
-            request.getRequestDispatcher("listaProductos.jsp").forward(request, response);
+            request.setAttribute("listaProducto", respuestaBD.contenido);
+            this.responseError(request, response, "", "listaProductos", respuestaBD.esError());
+            
         } else {
-            this.esError = true;
-            request.setAttribute("mensajeErrorBD", respuestaBD.mensaje);
-            request.setAttribute("esError", this.esError);
-            // Puedes manejar el error directamente aquí o llamar a un método específico
-            // this.responseError(request, respuestaBD.mensaje);
-            request.getRequestDispatcher("listaProductos.jsp").forward(request, response);
+            this.responseError(request, response, respuestaBD.mensaje, "listaProductos", respuestaBD.esError());
         }
     }
 
@@ -159,10 +147,119 @@ public class Controlador extends HttpServlet {
         }
         response.sendRedirect("index.jsp");
     }
+
+    private void responseError(HttpServletRequest request, HttpServletResponse response, String mensajeErrorDB, String path, Boolean esError) {
+        this.esError = esError;
+        try {
+            request.setAttribute("mensajeErrorBD", mensajeErrorDB);
+            request.setAttribute("esError", esError);
+            request.getRequestDispatcher(path + ".jsp").forward(request, response);
+        } catch (Exception e) {
+        }
+    }
+
+    private void ObtenerPorId(HttpServletRequest request, HttpServletResponse response, String id) {
+        int idProducto = Integer.parseInt(id);
+        Respuesta<Producto> respuestaProducto = repoProducto.GetProductoPorId(idProducto);
+
+        if (respuestaProducto.esExito()) {
+            Producto producto = respuestaProducto.contenido;
+            request.setAttribute("producto", producto);
+            this.responseError(request, response, "", "editar_producto", respuestaProducto.esError());
+        } else {
+            this.responseError(request, response, respuestaProducto.mensaje, "editar_producto", respuestaProducto.esError());
+        }
+    }
+
+    private void ElimibarPorId(HttpServletRequest request, HttpServletResponse response, String id) {
+        int idProductoEliminar = Integer.parseInt(id);
+        Respuesta respuestaEliminar = repoProducto.DeleteProductoPorId(idProductoEliminar);
+
+        try {
+            if (respuestaEliminar.esExito()) {
+                this.handleListaAction(request, response);
+            } else {
+                this.responseError(request, response, respuestaEliminar.mensaje, "editar_producto", respuestaEliminar.esError());
+            }
+        } catch (Exception e) {
+            this.responseError(request, response, "Error Interno: " + e.getMessage(), "editar_producto", respuestaEliminar.esError());
+        }
+    }
+
+    private void CrearProducto(HttpServletRequest request, HttpServletResponse response) {
+        String textCodBarra = request.getParameter("textCodBarra");
+        String textNombre = request.getParameter("textNombre");
+        String textDescripcion = request.getParameter("textDescripcion");
+        String textPrecio = request.getParameter("textPrecio");
+        String textStock = request.getParameter("textStock");
+
+        Producto producto = new Producto(0, textNombre, 0, textDescripcion, Double.parseDouble(textStock), textCodBarra);
+
+        Respuesta<Boolean> responseBD = repoProducto.ObtenerNombreRepetido(textNombre);
+
+        if (responseBD.esExito()) {
+
+            Respuesta<Boolean> responseBDCod = repoProducto.ObtenerCodigoRepetido(textCodBarra);
+
+            if (responseBDCod.esExito()) {
+
+                Respuesta<Producto> responseCrear = repoProducto.AgregarProducto(producto, textPrecio, responseBD.contenido, responseBDCod.contenido);
+
+                if (responseCrear.esExito()) {
+                    request.setAttribute("producto", new Producto());
+                    this.responseError(request, response, "Se Agrego Correctamente.", "crearProducto", responseCrear.esError());
+                } else {
+                    request.setAttribute("producto", producto);
+                    this.responseError(request, response, responseCrear.mensaje, "crearProducto", responseCrear.esError());
+                }
+            } else {
+                request.setAttribute("producto", producto);
+                this.responseError(request, response, responseBDCod.mensaje, "crearProducto", responseBDCod.esError());
+            }
+        } else {
+            request.setAttribute("producto", producto);
+            this.responseError(request, response, responseBD.mensaje, "crearProducto", responseBD.esError());
+        }
+    }
     
-    private void responseError(HttpServletRequest request, String mensajeError) {
-        this.esError = true;
-        request.setAttribute("mensajeErrorBD", mensajeError);
-        request.setAttribute("esError", esError);
+    private void Modificar(HttpServletRequest request, HttpServletResponse response) {
+        String textCodBarra = request.getParameter("textCodBarra");
+        String textNombre = request.getParameter("textNombre");
+        String textDescripcion = request.getParameter("textDescripcion");
+        String textPrecio = request.getParameter("textPrecio");
+        String textStock = request.getParameter("textStock");
+        String textId = request.getParameter("textId");
+
+        Producto producto = new Producto(Integer.parseInt(textId), textNombre, 0, textDescripcion, Double.parseDouble(textStock), textCodBarra);
+
+        Respuesta<Boolean> responseBD = repoProducto.ObtenerNombreRepetidoPorId(producto.getNombre(), producto.getId());
+
+        if (responseBD.esExito()) {
+
+            Respuesta<Boolean> responseBDCod = repoProducto.ObtenerCodigoRepetidoPorId(producto.getCodigoBarra(), producto.getId());
+
+            if (responseBDCod.esExito()) {
+
+                Respuesta<Producto> responseCrear = repoProducto.Modificar(producto, textPrecio, responseBD.contenido, responseBDCod.contenido);
+
+                if (responseCrear.esExito()) {
+                    request.setAttribute("producto", new Producto());
+                    try {
+                        this.handleListaAction(request, response);
+                    } catch (Exception e) {
+                        this.responseError(request, response, "Error Interno: "+e.getMessage(), "editar_producto", responseBDCod.esError());
+                    }
+                } else {
+                    request.setAttribute("producto", producto);
+                    this.responseError(request, response, responseCrear.mensaje, "editar_producto", responseCrear.esError());
+                }
+            } else {
+                request.setAttribute("producto", producto);
+                this.responseError(request, response, responseBDCod.mensaje, "editar_producto", responseBDCod.esError());
+            }
+        } else {
+            request.setAttribute("producto", producto);
+            this.responseError(request, response, responseBD.mensaje, "editar_producto", responseBD.esError());
+        }
     }
 }

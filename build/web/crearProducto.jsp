@@ -1,3 +1,4 @@
+<%@page import="Modelo.Producto"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,33 +22,63 @@
             </div>
         </header>
         <div class="container" style="margin-top: 2%;">
+            <%
+                Boolean esError = (Boolean) request.getAttribute("esError");
+                String mensajeError = (String) request.getAttribute("mensajeErrorBD");
+                Producto producto = (Producto) request.getAttribute("producto");
+
+                if (esError != null && mensajeError != "" && esError) {
+            %>
+            <div class="alert alert-danger" role="alert">
+                <%=mensajeError%>
+            </div>
+            <%} else {%>
+
+            <div class="alert alert-danger" role="alert" style="display: none;">
+                A simple danger alert—check it out!
+            </div>
+            <%}%>
+
+            <%
+                if (esError != null && !mensajeError.isEmpty() && !esError) {
+            %>
+            <div class="alert alert-success"role="alert">
+                <%=mensajeError%>
+            </div>
+
+            <%} else {%>
+
+            <div class="alert alert-success" role="alert" style="display: none;">
+            </div>
+            <%}%>
+
             <form id="miFormulario" action="Controlador" method="POST">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="textCodBarra" name="textCodBarra" placeholder="8as5s554sw" required>
+                    <input type="text" class="form-control" id="textCodBarra" value="<%=producto.getCodigoBarra() == null ? "" : producto.getCodigoBarra()%>" name="textCodBarra" placeholder="8as5s554sw" required>
                     <label for="floatingInput">Código de Barra</label>
                 </div>
                 <br>
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="textNombre" name="textNombre" placeholder="Nombre Producto" required>
+                    <input type="text" value="<%=producto.getNombre() == null ? "" : producto.getNombre()%>" class="form-control" id="textNombre" name="textNombre" placeholder="Nombre Producto" required>
                     <label for="floatingPassword">Nombre</label>
                 </div>
                 <br>
                 <div class="form-floating">
-                    <textarea type="text" class="form-control" id="textDescripcion" name="textDescripcion" placeholder="Descripción" style="height: 100px;"></textarea>
+                    <textarea type="text" value="<%=producto.getDescripcion() == null ? "" : producto.getDescripcion()%>" class="form-control" id="textDescripcion" name="textDescripcion" placeholder="Descripción" style="height: 100px;"></textarea>
                     <label for="floatingPassword">Descripcion</label>
                 </div>
                 <br>
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="textPrecio" name="textPrecio" placeholder="Precio" required>
+                    <input type="text" value="<%=producto.getPrecio() == 0 ? "" : producto.getPrecio()%>" class="form-control" id="textPrecio" name="textPrecio" placeholder="Precio" required>
                     <label for="floatingPassword">Precio</label>
                 </div>
                 <br>
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="textStock" name="textStock" placeholder="0" value="0">
+                    <input type="number" value="<%=producto.getStock() == 0 ? "" : producto.getStock()%>" class="form-control" id="textStock" name="textStock" placeholder="0"  min="0" required>
                     <label for="floatingPassword">Stock</label>
                 </div>
                 <br>
-                
+
                 <a href="Controlador?accion=cancelar" class="btn btn-outline-danger">Cancelar</a>
                 <input type="submit" name="accion" value="Agregar" class="btn btn-outline-success">
             </form>
