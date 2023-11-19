@@ -5,9 +5,12 @@
 package Controller;
 
 import Modelo.Respuesta;
+import Modelo.usuario;
 import Repositorio.RepositorioUsuario;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +24,11 @@ public class ControladorMain extends HttpServlet {
 
     RepositorioUsuario repoUsuario = new RepositorioUsuario();
     Boolean esError = false;
-    
+
+    LocalDate fechaHoy = LocalDate.now();
+    DateTimeFormatter formateador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    String fechaFormateada = fechaHoy.format(formateador);
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -30,7 +37,7 @@ public class ControladorMain extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ControladorMain</title>");            
+            out.println("<title>Servlet ControladorMain</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ControladorMain at " + request.getContextPath() + "</h1>");
@@ -51,6 +58,14 @@ public class ControladorMain extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String accion = request.getParameter("accion");
+        if (accion != null) {
+            if (accion.equalsIgnoreCase("cuenta-nueva")) {
+                request.setAttribute("usuario", new usuario());
+                this.responseError(request, response, "", "crear-usuario", false);
+                request.getRequestDispatcher("crear-usuario.jsp").forward(request, response);
+            }
+        }
         processRequest(request, response);
     }
 
@@ -65,23 +80,34 @@ public class ControladorMain extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          String accion = request.getParameter("accion");
-        if(accion.equalsIgnoreCase("Ingresar")){
+        String accion = request.getParameter("accion");
+        if (accion.equalsIgnoreCase("Ingresar")) {
             String user = request.getParameter("inputUsuario");
             String pass = request.getParameter("inputPassword");
-            
+
             Respuesta respuestaRepo = repoUsuario.ValidarUsuario(user, pass);
-            
-            if(respuestaRepo.esExito()){
+
+            if (respuestaRepo.esExito()) {
                 request.getRequestDispatcher("ControladorDashBoard?accion=lista").forward(request, response);
-            }else{
+            } else {
                 this.esError = true;
                 request.setAttribute("mensajeError", respuestaRepo.mensaje);
                 request.setAttribute("esError", esError);
                 request.getRequestDispatcher("index.jsp").forward(request, response);
             }
-        }else{
-             request.getRequestDispatcher("index.jsp").forward(request, response);
+        } else if (accion.equalsIgnoreCase("Crear")) {
+            String nombres = request.getParameter("nombres");
+            String apellidos = request.getParameter("apellidos");
+            String telefono = request.getParameter("telefono");
+            String usuario = request.getParameter("usuario");
+            String contrasena = request.getParameter("contrasena");
+
+            usuario user = new usuario(0, fechaFormateada + "-" + usuario, nombres, apellidos, telefono, usuario, contrasena, 0);
+
+            this.CrearCuenta(request, response, user);
+
+        } else {
+            request.getRequestDispatcher("index.jsp").forward(request, response);
         }
     }
 
@@ -95,4 +121,37 @@ public class ControladorMain extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private void CrearCuenta(HttpServletRequest request, HttpServletResponse response, usuario user) {
+
+        Respuesta<Boolean> repuesta = repoUsuario.ValidarUsuarioRepetido(user.getUsuario());
+
+        if (repuesta.esExito()) {
+
+            Respuesta<usuario> respuesta = repoUsuario.CrearUsuario(user, repuesta.contenido);
+
+            if (respuesta.esExito()) {
+                try {
+                    request.getRequestDispatcher("index.jsp").forward(request, response);
+                } catch (Exception e) {
+                    this.responseError(request, response, "Error Interno: " + e.getMessage(), "crear-usuario", true);
+                }
+            } else {
+                request.setAttribute("usuario", user);
+                this.responseError(request, response, respuesta.mensaje, "crear-usuario", respuesta.esError());
+            }
+        } else {
+            request.setAttribute("usuario", user);
+            this.responseError(request, response, repuesta.mensaje, "crear-usuario", repuesta.esError());
+        }
+    }
+
+    private void responseError(HttpServletRequest request, HttpServletResponse response, String mensajeErrorDB, String path, Boolean esError) {
+        this.esError = esError;
+        try {
+            request.setAttribute("mensajeErrorBD", mensajeErrorDB);
+            request.setAttribute("esError", esError);
+            request.getRequestDispatcher(path + ".jsp").forward(request, response);
+        } catch (Exception e) {
+        }
+    }
 }

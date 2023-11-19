@@ -27,8 +27,6 @@
         <section>
             <p>Bienvenido al sistema de gestión de inventario de productos.</p>
             <a href="Controlador?accion=lista" class="cta-button">Productos</a>
-            
-            <a href="agregar.html" class="cta-button" style="margin-top: 1%">Agregar Categoria</a>
         </section>
         <footer>
             <p>&copy; 2023 Inventario de Productos </p>

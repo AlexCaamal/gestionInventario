@@ -43,10 +43,11 @@
                 <%
                     }
                 %>
-
-
                 <div style="text-align: right;"> <input type="submit" name="accion" class="btn btn-primary" value="Ingresar" style="height: 50px; width: 100px"></div>
             </form>
+                <div style="width: 100%; margin-top: 5%;">
+                <a href="ControladorMain?accion=cuenta-nueva" class="btn btn-primary" style="height: 50px; width: 200px; justify-content: center; text-align: center;"> Crear Cuenta </a>
+            </div>
         </div>
         <footer>
             <p><li> Juan Armando Carranza Madagan <li> Erick Armando Díaz Jimenez <br> &copy; 2023 Inventario de Productos</p>

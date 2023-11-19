@@ -9,10 +9,6 @@
         <servlet-class>Controller.ControladorDashBoard</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ControladorListaProductos</servlet-name>
-        <servlet-class>Controller.ControladorListaProductos</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>Controlador</servlet-name>
         <servlet-class>Controller.Controlador</servlet-class>
     </servlet>
@@ -23,10 +19,6 @@
     <servlet-mapping>
         <servlet-name>ControladorDashBoard</servlet-name>
         <url-pattern>/ControladorDashBoard</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ControladorListaProductos</servlet-name>
-        <url-pattern>/ControladorListaProductos</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Controlador</servlet-name>
