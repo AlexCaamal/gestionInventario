@@ -58,6 +58,16 @@ public class Controlador extends HttpServlet {
             case "Modificar":
                 request.getRequestDispatcher("Controlador?accion=lista").forward(request, response);
                 break;
+            case "Buscar":
+                String textoBuscar = request.getParameter("busqueda");
+
+                if (textoBuscar == null) {
+                    handleListaAction(request, response);
+                } else {
+                    this.BuscarProductos(request, response, textoBuscar);
+                }
+
+                break;
             default:
                 throw new AssertionError("Acción no válida: " + accion);
         }
@@ -133,7 +143,7 @@ public class Controlador extends HttpServlet {
         if (respuestaBD.esExito()) {
             request.setAttribute("listaProducto", respuestaBD.contenido);
             this.responseError(request, response, "", "listaProductos", respuestaBD.esError());
-            
+
         } else {
             this.responseError(request, response, respuestaBD.mensaje, "listaProductos", respuestaBD.esError());
         }
@@ -221,7 +231,7 @@ public class Controlador extends HttpServlet {
             this.responseError(request, response, responseBD.mensaje, "crearProducto", responseBD.esError());
         }
     }
-    
+
     private void Modificar(HttpServletRequest request, HttpServletResponse response) {
         String textCodBarra = request.getParameter("textCodBarra");
         String textNombre = request.getParameter("textNombre");
@@ -247,7 +257,7 @@ public class Controlador extends HttpServlet {
                     try {
                         this.handleListaAction(request, response);
                     } catch (Exception e) {
-                        this.responseError(request, response, "Error Interno: "+e.getMessage(), "editar_producto", responseBDCod.esError());
+                        this.responseError(request, response, "Error Interno: " + e.getMessage(), "editar_producto", responseBDCod.esError());
                     }
                 } else {
                     request.setAttribute("producto", producto);
@@ -261,5 +271,20 @@ public class Controlador extends HttpServlet {
             request.setAttribute("producto", producto);
             this.responseError(request, response, responseBD.mensaje, "editar_producto", responseBD.esError());
         }
+    }
+
+    private void BuscarProductos(HttpServletRequest request, HttpServletResponse response, String criterio)
+            throws ServletException, IOException {
+
+        Respuesta<List<Producto>> respuestaBD = this.repoProducto.GetProductoPorCriterio(criterio);
+
+        if (respuestaBD.esExito()) {
+            request.setAttribute("listaProducto", respuestaBD.contenido);
+            this.responseError(request, response, "", "listaProductos", respuestaBD.esError());
+
+        } else {
+            this.responseError(request, response, respuestaBD.mensaje, "listaProductos", respuestaBD.esError());
+        }
+
     }
 }

@@ -44,6 +44,35 @@ public class RepositorioProductos {
 
         return new Respuesta<List<Producto>>(listaProductos);
     }
+    
+    public Respuesta<List<Producto>> GetProductoPorCriterio(String criterio) {
+        List<Producto> listaProductos = new ArrayList<Producto>();
+        try {
+            String sql = "SELECT * FROM producto WHERE Activo = 1 AND (CodigoBarra LIKE '%"+criterio+"%' OR Nombre LIKE '%"+criterio+"%' OR Descripcion LIKE '%"+criterio+"%')";
+            conexion = ConexionBD.GetConnection();
+            ps = conexion.prepareStatement(sql);
+            rs = ps.executeQuery();
+            Producto prod;
+            while (rs.next()) {
+                prod = new Producto();
+                prod.setCodigoBarra(rs.getString("CodigoBarra"));
+                prod.setId(rs.getInt("Id"));
+                prod.setNombre(rs.getString("Nombre"));
+                prod.setDescripcion(rs.getString("Descripcion"));
+                prod.setPrecio(rs.getDouble("Precio"));
+                prod.setStock(rs.getDouble("Stock"));
+                listaProductos.add(prod);
+            }
+            conexion.close();
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            return new Respuesta<List<Producto>>("Error BD: No se a completado la consulta de Productos, intente nuevamente.");
+        }
+
+        return new Respuesta<List<Producto>>(listaProductos);
+    }
 
     public Respuesta<Producto> GetProductoPorId(int idProducto) {
         Producto producto = new Producto();

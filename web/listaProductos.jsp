@@ -33,6 +33,11 @@
             </div>
         </header>
         <div class="container">
+            <form class="search-form" action="Controlador" method="GET">
+                <label class="form-label" for="search">Buscar:</label>
+                <input class="form-input" type="text" id="busqueda" name="busqueda" placeholder="Ingrese su búsqueda">
+                <button name="accion" value="Buscar" class="form-button" type="submit">Buscar</button>
+            </form>
             <%
                 String respuestaBaseDeDatos = (String) request.getAttribute("respuestaBaseDeDatos");
                 if (respuestaBaseDeDatos != null) {
